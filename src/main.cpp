@@ -52,6 +52,18 @@ int _tmain(int argc, _TCHAR* argv[])
 	//終了待ち
 	while(true)
 	{
+		//スレッドチェック
+		if(audio_device.get_recording_thread_error() == true)
+		{
+			//エラーメッセージ
+			printf("録音スレッドにエラーが発生したため、録音処理を中止します。\n");
+			system("PAUSE");
+			//終了処理
+			audio_device.stop();
+			audio_device.release();
+			break;
+		}
+
 		//Zキー押下待ち
 		if(GetAsyncKeyState('Z') & 0x01)
 		{

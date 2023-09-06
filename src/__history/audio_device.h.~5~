@@ -1,0 +1,92 @@
+#ifndef AUDIO_DEVICEH
+#define AUDIO_DEVICEH
+#include <mmdeviceapi.h>
+#include <Audioclient.h>
+#include <mmiscapi.h>
+#include <memory>
+#include <vector>
+#include <array>
+#include <thread>
+#include <deque>
+#include <mutex>
+#include <atomic>
+//------------------------------
+// オーディオデバイス
+//------------------------------
+class AudioDevice
+{
+private:
+	static const int MAX_WAVE_QUEUE = 16;
+private:
+	enum class Status
+	{
+		Reinitializing,
+		Constructed,
+		Preparing,
+		Playing,
+		StopRequest, //停止要求
+		Stopped,     //停止状態
+	};
+
+	IMMDeviceEnumerator *enumerator;
+	IMMDevice           *device;
+	IAudioClient        *audio_client;
+	IAudioCaptureClient *capture_client;
+	int                  sampling_rate;
+	int                  num_channels;
+	int                  bit_per_sample;
+	UINT32               buffer_frame_count;
+	std::atomic<Status>  status;
+	//waveファイル作成
+	HMMIO    hmmio;
+	MMCKINFO mmckRiff;
+	MMCKINFO mmckFmt;
+	MMCKINFO mmckData;
+
+	//最終エラー文字列
+	std::string last_error;
+	//録音スレッド
+	std::thread *recorder;
+	//AudioClient稼働状態
+	bool isAudioClientActive;
+	//ウェーブフォーマット
+	WAVEFORMATEXTENSIBLE  wf;
+	//waveファイル作成用ウェーブフォーマット
+	WAVEFORMATEX wf2;
+	//録音結果の生成wavファイル名
+	std::string wave_file;
+	//ウェーブ情報のシーケンスコンテナ
+	std::deque<std::vector<short>> wave_deque;
+	//ロックオブジェクト
+	std::mutex mtx_;
+	//エンドポイントバッファーのサイズ
+	UINT32 bufferFrameCount;
+private:
+	//録音スレッド
+	void recordingTh();
+public:
+	//コンストラクタ
+	AudioDevice();
+	//デストラクタ
+	~AudioDevice();
+public:
+	//リソース確保(初期化)
+	bool ensure(int buffer_length_millisec);
+	//リソース解放
+	bool release();
+	//録音開始
+	bool start();
+	//録音終了
+	bool stop();
+	//現在取得したWaveデータを取得する
+	bool get_buffer(std::vector<short>& wave_inf);
+	//録音結果の生成wavファイル名をセット
+	bool set_wav_file(const std::string& file_name);
+	//サンプリングレートを取得する
+	int  get_sampling_rate();
+	//チャンネル数を取得する(通常はステレオで２、モノラルで１)
+	int  get_num_channels();
+	//最後のエラーのメッセージ文字列を取得する
+	std::string get_last_error();
+};
+#endif

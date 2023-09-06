@@ -53,12 +53,14 @@ bool AudioDevice::ensure(int buffer_length_millisec)
 	hr = enumerator->GetDefaultAudioEndpoint(eRender,eConsole,&device);
 	if(FAILED(hr))
 	{
+		release();
 		last_error = "既定のオーディオエンドポイントの取得に失敗しました。";
 		return false;
 	}
 	hr = device->Activate(__uuidof(IAudioClient),CLSCTX_ALL,nullptr,(void **)&audio_client);
 	if (FAILED(hr))
 	{
+		release();
 		last_error = "オーディオデバイスを作動させる事に失敗しました。";
 		return false;
 	}
@@ -66,6 +68,7 @@ bool AudioDevice::ensure(int buffer_length_millisec)
 	hr = audio_client->GetMixFormat(&mix_format);
 	if (FAILED(hr))
 	{
+		release();
 		last_error = "ミックスフォーマットの取得に失敗しました。";
 		return false;
 	}
@@ -84,32 +87,28 @@ bool AudioDevice::ensure(int buffer_length_millisec)
 		mix_format,
 		nullptr
 	);
-	// Get the size of the allocated buffer.
+	//GetBufferSize メソッドは、エンドポイントバッファーのサイズ (最大容量) を取得します。
 	hr = audio_client->GetBufferSize(&bufferFrameCount);
 	if(FAILED(hr))
 	{
-		last_error = "Failed to get buffer size.";
+		release();
+		last_error = "エンドポイントバッファーのサイズの取得失敗しました。";
 		return false;
 	}
 	//CoTaskMemAlloc 関数または CoTaskMemRealloc 関数の呼び出しによって以前に割り当てられたタスク メモリのブロックを解放します。
 	CoTaskMemFree(mix_format);
 	if(FAILED(hr))
 	{
-		last_error = "Failed to initialize audio client.";
-		return false;
-	}
-	//GetBufferSize メソッドは、エンドポイント バッファーのサイズ (最大容量) を取得します。
-	hr = audio_client->GetBufferSize(&buffer_frame_count);
-	if (FAILED(hr))
-	{
-		last_error = "Failed to get buffer size.";
+		release();
+		last_error = "オーディオクライアントの初期化に失敗しました。";
 		return false;
 	}
 	//GetService メソッドは、オーディオ クライアント オブジェクトから追加のサービスにアクセスします。
 	hr = audio_client->GetService(IID_PPV_ARGS(&capture_client));
 	if(FAILED(hr))
 	{
-		last_error = "Failed get capture client.";
+		release();
+		last_error = "キャプチャークライアントの取得に失敗しました。";
 		return false;
 	}
 	return true;
@@ -151,21 +150,23 @@ bool AudioDevice::start()
 	if(recorder != nullptr || isAudioClientActive == true)
 	{
 		//稼働中なので処理しない
-		last_error = "Recording is running.";
+		release();
+		last_error = "録音は実行中なので、新たに録音を実行する事は出来ません。";
 		return false;
 	}
 	//Start メソッドは、オーディオ ストリームを開始します。
 	hr = audio_client->Start();
 	if(FAILED(hr))
 	{
-		last_error = "Failed to start recording.";
+		release();
+		last_error = "録音は実行中なので、新たに録音を実行する事は出来ません。";
 		return false;
 	}
 	//AudioClient稼働状態アクティブ
 	isAudioClientActive = true;
 	//状況は準備
 	status = Status::Preparing;
-	//waveファイル作成用ウェーブフォーマット設定
+	//waveファイル作成用ウェーブフォーマット設定の写しを得る
 	wf2.wFormatTag      = WAVE_FORMAT_PCM;
 	wf2.nChannels       = wf.Format.nChannels;
 	wf2.nSamplesPerSec  = wf.Format.nSamplesPerSec;
@@ -220,7 +221,7 @@ bool AudioDevice::stop()
 	//スレッドの存在チェック
 	if(recorder == nullptr)
 	{
-		last_error = "Recording is not running.";
+		last_error = "録音は実行で無いので、録音を停止する事は出来ません。";
 		return false;
 	}
 	// 録音スレッドを停止
@@ -244,7 +245,7 @@ bool AudioDevice::stop()
 		//チェック
 		if(FAILED(hr))
 		{
-			last_error = "Audio client is not able to stop.";
+			last_error = "オーディオクライアントの停止に失敗しました。";
 			return false;
 		}
 		//AudioClient稼働状態非アクティブ
@@ -274,13 +275,6 @@ int AudioDevice::get_num_channels()
 	return num_channels;
 }
 //-----------------------------------
-//デフォルトデバイスを得る
-//-----------------------------------
-IMMDevice* AudioDevice::get_default_device()
-{
-	return device;
-}
-//-----------------------------------
 //バッファを得る
 //-----------------------------------
 bool AudioDevice::get_buffer(std::vector<short>& wave_inf)
@@ -304,19 +298,18 @@ bool AudioDevice::get_buffer(std::vector<short>& wave_inf)
 	return true;;
 }
 //-----------------------------------
-//バッファをリセット
-//-----------------------------------
-void AudioDevice::reset_buffer()
-{
-	//準備状態
-	status = Status::Preparing;
-}
-//-----------------------------------
 //最後のエラー文字列を得る
 //-----------------------------------
 std::string AudioDevice::get_last_error()
 {
 	return last_error;
+}
+//-----------------------------------
+//録音スレッドのエラーの有無を取得する
+//-----------------------------------
+bool AudioDevice::get_recording_thread_error()
+{
+	return isRecordThreadError;
 }
 //-----------------------------------
 //録音スレッド
@@ -335,13 +328,12 @@ void AudioDevice::recordingTh()
 	short              sval;
 	float             *wave_float;
 	short             *wave_short;
-	char               buf[256];
+	//録音スレッドのエラーフラグOFF
+	isRecordThreadError = false;;
 
 	// クリティカルセクション初期化
 	InitializeCriticalSection(&critical_section);
 
-	//開始時刻
-	DWORD st = GetTickCount();
 	//スレッドループ
 	while(true)
 	{
@@ -396,7 +388,10 @@ void AudioDevice::recordingTh()
 				hr = capture_client->GetBuffer(&fragment,&num_frames_available,&flags,nullptr,nullptr);
 				if(FAILED(hr))
 				{
-					throw std::runtime_error("Failed to get buffer.");
+					//録音スレッドのエラーフラグON
+					isRecordThreadError = true;
+//					throw std::runtime_error("Failed to get buffer.");
+					return;
 				}
 				//指定したクリティカル セクション オブジェクトの所有権を待機します。 この関数は、呼び出し元のスレッドに所有権が付与されたときに返されます。
 				EnterCriticalSection(&critical_section);
@@ -466,29 +461,22 @@ void AudioDevice::recordingTh()
 				}
 				else
 				{
-					throw std::runtime_error("Bits per sample is not supported.");
+					//録音スレッドのエラーフラグON
+					isRecordThreadError = true;
+//					throw std::runtime_error("Bits per sample is not supported.");
+					return;
 				}
 				//ウェーブ情報のシーケンスコンテナ連結
 				sum_wave_data.insert(sum_wave_data.end(),wave_data.begin(),wave_data.end());
-
-//				wave_deque.push_back(wave_data);
-//				//シーケンスコンテナの要素数チェック
-//				while(wave_deque.size() > MAX_WAVE_QUEUE)
-//				{
-//					wave_deque.pop_front();
-//				}
-//				//waveファイル名が有効の場合は追記
-//				if(hmmio != nullptr)
-//				{
-//					mmioWrite(hmmio,(char *)wave_data.data(),sizeof(short)*num_frames_available*2);
-//				}
 				//指定したクリティカル セクション オブジェクトの所有権を解放します。
 				LeaveCriticalSection(&critical_section);
 				//ReleaseBuffer メソッドはバッファーを解放します。
 				hr = capture_client->ReleaseBuffer(num_frames_available);
 				if(FAILED(hr))
 				{
-					throw std::runtime_error("Failed to release buffer.");
+					isRecordThreadError = true;
+//					throw std::runtime_error("Failed to release buffer.");
+					return;
 				}
 				//パケットに残りがある分だけループ
 				capture_client->GetNextPacketSize(&packetLength);

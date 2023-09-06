@@ -47,10 +47,12 @@ private:
 	std::string last_error;
 	//録音スレッド
 	std::thread *recorder;
+	//録音スレッドのエラーフラグ
+	bool isRecordThreadError;
 	//AudioClient稼働状態
 	bool isAudioClientActive;
 	//ウェーブフォーマット
-	WAVEFORMATEXTENSIBLE  wf;
+	WAVEFORMATEXTENSIBLE wf;
 	//waveファイル作成用ウェーブフォーマット
 	WAVEFORMATEX wf2;
 	//録音結果の生成wavファイル名
@@ -59,9 +61,8 @@ private:
 	std::deque<std::vector<short>> wave_deque;
 	//ロックオブジェクト
 	std::mutex mtx_;
-
+	//エンドポイントバッファーのサイズ
 	UINT32 bufferFrameCount;
-
 private:
 	//録音スレッド
 	void recordingTh();
@@ -71,7 +72,7 @@ public:
 	//デストラクタ
 	~AudioDevice();
 public:
-	//リソース確保
+	//リソース確保(初期化)
 	bool ensure(int buffer_length_millisec);
 	//リソース解放
 	bool release();
@@ -83,11 +84,13 @@ public:
 	bool get_buffer(std::vector<short>& wave_inf);
 	//録音結果の生成wavファイル名をセット
 	bool set_wav_file(const std::string& file_name);
-public:
-	int         get_sampling_rate();
-	int         get_num_channels();
-	IMMDevice  *get_default_device();
-	void        reset_buffer();
+	//サンプリングレートを取得する
+	int  get_sampling_rate();
+	//チャンネル数を取得する(通常はステレオで２、モノラルで１)
+	int  get_num_channels();
+	//最後のエラーのメッセージ文字列を取得する
 	std::string get_last_error();
+	//録音スレッドのエラーの有無を取得する
+	bool get_recording_thread_error();
 };
 #endif
