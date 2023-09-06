@@ -46,27 +46,27 @@ bool AudioDevice::ensure(int buffer_length_millisec)
 	hr = CoCreateInstance(__uuidof(MMDeviceEnumerator),nullptr,CLSCTX_ALL,IID_PPV_ARGS(&enumerator));
 	if(FAILED(hr))
 	{
-		last_error = "Failed to create IMMDeviceEnumerator.";
+		last_error = "IMMDeviceEnumeratorの生成に失敗しました。";
 		return false;
 	}
 	//GetDefaultAudioEndpoint メソッドは、指定されたデータ フローの方向とロールの既定のオーディオ エンドポイントを取得します。
 	hr = enumerator->GetDefaultAudioEndpoint(eRender,eConsole,&device);
 	if(FAILED(hr))
 	{
-		last_error = "Failed to get default audio endpoint.";
+		last_error = "既定のオーディオエンドポイントの取得に失敗しました。";
 		return false;
 	}
 	hr = device->Activate(__uuidof(IAudioClient),CLSCTX_ALL,nullptr,(void **)&audio_client);
 	if (FAILED(hr))
 	{
-		last_error = "Failed to activate audio device.";
+		last_error = "オーディオデバイスを作動させる事に失敗しました。";
 		return false;
 	}
 	WAVEFORMATEX *mix_format = nullptr;
 	hr = audio_client->GetMixFormat(&mix_format);
 	if (FAILED(hr))
 	{
-		last_error = "Failed to get mix format.";
+		last_error = "ミックスフォーマットの取得に失敗しました。";
 		return false;
 	}
 	//ウェーブフォーマットを確保
