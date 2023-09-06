@@ -4,7 +4,7 @@
         <ProjectVersion>19.2</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Console</AppType>
@@ -113,10 +113,12 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Icon_MainIcon>gorecord_Icon.ico</Icon_MainIcon>
         <Manifest_File>(なし)</Manifest_File>
-        <UWP_CppLogo44>C:\Users\owner\Desktop\gorec2.png</UWP_CppLogo44>
-        <UWP_CppLogo150>C:\Users\owner\Desktop\gorec2.png</UWP_CppLogo150>
-        <FinalOutputDir>D:\Users\owner\Documents\Projects10\gorecord\gorecord\bin</FinalOutputDir>
+        <UWP_CppLogo44>gorec2.png</UWP_CppLogo44>
+        <UWP_CppLogo150>gorec2.png</UWP_CppLogo150>
+        <FinalOutputDir>D:\Users\owner\Documents\Projects10\gorecord\gorecord\src\bin</FinalOutputDir>
         <IntermediateOutputDir>D:\Users\owner\Documents\Projects10\gorecord\obj\obj32d</IntermediateOutputDir>
+        <_TCHARMapping>char</_TCHARMapping>
+        <Debugger_RunParams>test.wav</Debugger_RunParams>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <Defines>NDEBUG;$(Defines)</Defines>
@@ -125,7 +127,7 @@
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <BCC_UseClassicCompiler>false</BCC_UseClassicCompiler>
         <BCC_PCHName_Clang>gorecordPCH1.h</BCC_PCHName_Clang>
-        <FinalOutputDir>D:\Users\owner\Documents\Projects10\gorecord\gorecord\bin</FinalOutputDir>
+        <FinalOutputDir>D:\Users\owner\Documents\Projects10\gorecord\gorecord\src\bin</FinalOutputDir>
         <IntermediateOutputDir>D:\Users\owner\Documents\Projects10\gorecord\obj\obj32r</IntermediateOutputDir>
         <VerInfo_Locale>1041</VerInfo_Locale>
         <Icon_MainIcon>gorecord_Icon.ico</Icon_MainIcon>
@@ -137,6 +139,8 @@
         <VerInfo_Build>3</VerInfo_Build>
         <VerInfo_Keys>CompanyName=さくら電算;FileDescription=PCが発する音をwavファイルにするコマンド;FileVersion=0.1.0.3;InternalName=gorecord;LegalCopyright=さくら電算;LegalTrademarks=;OriginalFilename=gorecord.exe;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=gorecord;ProductVersion=0.1.0;Comments=</VerInfo_Keys>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
+        <_TCHARMapping>char</_TCHARMapping>
+        <Debugger_RunParams>test.wav</Debugger_RunParams>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <BCC_PCHName_Clang>gorecordPCH1.h</BCC_PCHName_Clang>
@@ -193,7 +197,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="C:\Users\owner\Desktop\gorec2.png" Configuration="Debug" Class="UWP_CppLogo44">
+                <DeployFile LocalName="gorec2.png" Configuration="Debug" Class="UWP_CppLogo44">
                     <Platform Name="Win32">
                         <RemoteDir>Assets\</RemoteDir>
                         <RemoteName>Logo44x44.png</RemoteName>
