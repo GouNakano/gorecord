@@ -37,8 +37,8 @@ OS : Windows10または11
 
 ## 開発環境
 
-IED : C++Builder 10.4 Comminuty Edition
-言語 : C++(17)
+IED : C++Builder 10.4 Comminuty Edition  
+言語 : C++(17)  
 フレームワーク : .NET Framework(Windows10/11では標準でインストールされています)
 
 ## ソースコード及び使用技術

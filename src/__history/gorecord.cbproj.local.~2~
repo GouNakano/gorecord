@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2022/06/07 21:27:16.000.489,=D:\Users\owner\Documents\Embarcadero\Studio\Projects\Project1PCH1.h</Transaction>
+    <Transaction>2022/06/07 21:27:16.000.895,=D:\Users\owner\Documents\Embarcadero\Studio\Projects\Unit1.cpp</Transaction>
+    <Transaction>2023/01/19 13:12:23.000.632,=D:\Users\owner\Documents\Embarcadero\Studio\Projects\Unit1.cpp</Transaction>
+    <Transaction>2023/01/19 13:12:23.000.560,=D:\Users\owner\Documents\Embarcadero\Studio\Projects\Project1PCH1.h</Transaction>
+    <Transaction>2023/09/06 12:01:20.000.131,=D:\Users\owner\Documents\Embarcadero\Studio\Projects\File1.cpp</Transaction>
+    <Transaction>2023/09/06 12:01:20.000.051,=D:\Users\owner\Documents\Embarcadero\Studio\Projects\Project1PCH1.h</Transaction>
+    <Transaction>2023/09/06 12:03:44.000.524,D:\Users\owner\Documents\Embarcadero\Studio\Projects\File1.cpp=D:\Users\owner\Documents\Projects10\gorecord\gorecord\src\main.cpp</Transaction>
+    <Transaction>2023/09/06 12:03:47.000.585,D:\Users\owner\Documents\Embarcadero\Studio\Projects\Project1PCH1.h=D:\Users\owner\Documents\Projects10\gorecord\gorecord\src\Project1PCH1.h</Transaction>
+    <Transaction>2023/09/06 12:03:58.000.838,D:\Users\owner\Documents\Embarcadero\Studio\Projects\Project1.cbproj=D:\Users\owner\Documents\Projects10\gorecord\gorecord\src\gorecord.cbproj</Transaction>
+    <Transaction>2023/09/06 12:03:58.000.827,D:\Users\owner\Documents\Projects10\gorecord\gorecord\src\Project1PCH1.h=D:\Users\owner\Documents\Projects10\gorecord\gorecord\src\gorecordPCH1.h</Transaction>
+    <Transaction>2023/09/06 12:28:18.000.007,=D:\Users\owner\Documents\Projects10\gorecord\gorecord\src\audio_device.cpp</Transaction>
+  </Transactions>
+</BorlandProject>
