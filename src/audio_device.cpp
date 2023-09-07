@@ -359,7 +359,7 @@ void AudioDevice::recordingTh()
 			continue;
 		}
 		UINT32 packetLength = 0;
-		//Sleep for half the buffer duration.
+		//スレッドループに入る前の休止
 		Sleep(10);
 
 		while(true)
@@ -390,7 +390,6 @@ void AudioDevice::recordingTh()
 				{
 					//録音スレッドのエラーフラグON
 					isRecordThreadError = true;
-//					throw std::runtime_error("Failed to get buffer.");
 					return;
 				}
 				//指定したクリティカル セクション オブジェクトの所有権を待機します。 この関数は、呼び出し元のスレッドに所有権が付与されたときに返されます。
@@ -432,7 +431,7 @@ void AudioDevice::recordingTh()
 						{
 							try
 							{
-								//32ビットfloatから変換して16ビットの範囲でセット
+								//32ビットfloatから変換して16ビットの範囲(16ビット量子化)でセット
 								dval = wave_float[cnt];
 								dval *= 32768.0;
 								sval  = static_cast<short>(dval);
@@ -441,7 +440,14 @@ void AudioDevice::recordingTh()
 							}
 							catch(Exception& e)
 							{
-								wave_data[cnt] = wave_data[cnt-1];
+								if(cnt > 0)
+								{
+									wave_data[cnt] = wave_data[cnt-1];
+								}
+								else
+								{
+									wave_data[cnt] = 0;
+								}
 							}
 						}
 					}
@@ -463,7 +469,6 @@ void AudioDevice::recordingTh()
 				{
 					//録音スレッドのエラーフラグON
 					isRecordThreadError = true;
-//					throw std::runtime_error("Bits per sample is not supported.");
 					return;
 				}
 				//ウェーブ情報のシーケンスコンテナ連結
@@ -475,7 +480,6 @@ void AudioDevice::recordingTh()
 				if(FAILED(hr))
 				{
 					isRecordThreadError = true;
-//					throw std::runtime_error("Failed to release buffer.");
 					return;
 				}
 				//パケットに残りがある分だけループ
